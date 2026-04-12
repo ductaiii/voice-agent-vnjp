@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Speech-to-speech backend orchestrating Google STT, Vertex AI, DeepL, and D-ID.",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "echo \"No backend tests configured yet\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@google-cloud/speech": "^7.3.0",
+    "@google-cloud/text-to-speech": "^6.4.0",
+    "cors": "^2.8.5",
+    "deepl-node": "^1.24.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  }
+}

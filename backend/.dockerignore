@@ -1,0 +1,8 @@
+.env
+.ENV
+google-credentials.json
+node_modules
+tmp
+uploads
+.git
+*.log

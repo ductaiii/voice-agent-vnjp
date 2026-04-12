@@ -1,0 +1,42 @@
+# name: Deploy VoiceToVoice CI/CD
+
+# # 1. Cò súng: Kích hoạt khi có code mới đẩy lên hoặc merge vào nhánh main
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     # Bước 1: Kéo code mới nhất từ Github về máy chủ ảo của Github Actions
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     # Bước 2: Đăng nhập vào Docker Hub bằng Secrets đã khai báo
+#     - name: Login to Docker Hub
+#       uses: docker/login-action@v2
+#       with:
+#         username: ${{ secrets.DOCKERHUB_USERNAME }}
+#         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+#     # Bước 3: Đọc file compose, build image và đẩy thẳng lên Docker Hub
+#     - name: Build and Push Docker images
+#       run: |
+#         docker compose build
+#         docker compose push
+
+#     # Bước 4: Đóng vai sếp, tự động dùng SSH Key chui vào máy ảo GCP để gõ lệnh cập nhật
+#     - name: Deploy to GCP VM
+#       uses: appleboy/ssh-action@master
+#       with:
+#         host: ${{ secrets.GCP_HOST_IP }}
+#         username: ${{ secrets.GCP_SSH_USER }}
+#         key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+#         script: |
+#           cd /home/ngoalong245/voicetovoice
+#           docker compose pull
+#           docker compose up -d
+#           docker image prune -f # Dọn dẹp rác/image cũ cho nhẹ máy
