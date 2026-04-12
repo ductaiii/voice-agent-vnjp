@@ -107,16 +107,42 @@ Do not use `localhost` for `PUBLIC_BASE_URL`. D-ID needs a public HTTPS URL that
 
 ## Docker Compose
 
-The repository also includes a Docker Compose setup.
+The repository includes a Docker Compose setup for local containerized runs.
+
+Before you start:
+
+- Make sure [`.env`](.env) exists in the repository root.
+- Make sure [`backend/google-credentials.json`](backend/google-credentials.json) exists and points to a valid Google service account key.
+- If you use the Japanese to Vietnamese flow, `PUBLIC_BASE_URL` must point to a public HTTPS URL, such as a Cloudflare Tunnel URL.
 
 ```powershell
 docker compose up -d --build
 ```
 
-Expected ports:
+What this starts:
 
-- Frontend: `http://localhost/ver2`
-- Backend health endpoint: `http://localhost:8443/api/health`
+- Backend container mapped to host `8443`.
+- Frontend container mapped to host `80`.
+
+Useful checks:
+
+```powershell
+docker compose ps
+curl http://127.0.0.1:8443/api/health
+curl http://127.0.0.1/api/health
+```
+
+Open the app at:
+
+- `http://localhost/ver2`
+
+Useful commands:
+
+```powershell
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose down
+```
 
 Important Docker notes:
 
@@ -124,6 +150,12 @@ Important Docker notes:
 - The backend still needs the Google credentials JSON mounted into the container at `/app/google-credentials.json`.
 - The frontend container also needs `VITE_API_BASE_URL=http://127.0.0.1:8443` so the browser calls the backend on the published Docker port instead of falling back to `127.0.0.1:8081`.
 - If you click Run on an image directly in Docker Desktop, `env_file` is not applied automatically. In that case you must add the environment variables, the frontend API URL, and the credentials mount by hand.
+
+If you use Cloudflare Tunnel with Docker, point it to the published backend port on the host:
+
+```powershell
+cloudflared tunnel --url http://127.0.0.1:8443
+```
 
 If you use Docker locally, keep the Google credentials outside the image and mount them at runtime, or use Application Default Credentials on the host or VM.
 
