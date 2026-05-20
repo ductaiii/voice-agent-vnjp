@@ -1,4 +1,4 @@
-# Voice Agent Vn-Ja
+# Voice Agent Vn-Jp
 
 Voice Agent Vn-Ja is a realtime speech translation demo for Vietnamese and Japanese. It combines Google Speech-to-Text, DeepL, Google Text-to-Speech, and D-ID to turn spoken or typed input into an interactive avatar experience.
 
