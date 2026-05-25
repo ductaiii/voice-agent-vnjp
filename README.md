@@ -222,3 +222,7 @@ npm run preview  # Preview production build
 ## Status
 
 Voice Agent Vn-Jp is a realtime demo app. The main path is already wired through React, Express, DeepL, Google STT/TTS, and D-ID; the next useful improvements are stronger automated tests, production-friendly frontend serving, and tighter CI/CD for deployment.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
