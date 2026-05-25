@@ -1,184 +1,224 @@
-# Voice Agent Vn-Jp
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="Voice Agent Vn-Jp logo" width="104" height="104" />
+</p>
 
-Voice Agent Vn-Ja is a realtime speech translation demo for Vietnamese and Japanese. It combines Google Speech-to-Text, DeepL, Google Text-to-Speech, and D-ID to turn spoken or typed input into an interactive avatar experience.
+<h1 align="center">Voice Agent Vn-Jp</h1>
 
+<p align="center">
+  A realtime Vietnamese-Japanese voice translation app with an interactive D-ID avatar.
+</p>
 
-<!--
-Paste your demo video embed here.
-Example options:
-- <video controls src="https://..." width="100%"></video>
-- [![Watch the demo](thumbnail-url)](video-url)
--->
+<p align="center">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61dafb" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-7-646cff" />
+  <img alt="Express" src="https://img.shields.io/badge/Express-5-111827" />
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-20%2B-3c873a" />
+  <img alt="Docker" src="https://img.shields.io/badge/Docker-ready-2496ed" />
+</p>
 
 ## Overview
 
-The app currently supports two main flows:
+Voice Agent Vn-Jp turns spoken, uploaded, or typed Vietnamese and Japanese into an avatar-led translation experience. The frontend provides the realtime voice UI and D-ID Agent playback, while the backend handles speech recognition, translation, speech synthesis, and public audio URLs.
 
-- Vietnamese to Japanese text translation.
-- Japanese to Vietnamese translation with audio generation for D-ID.
+The app currently focuses on two flows:
 
-The frontend is a React + Vite app, while the backend is an Express API that handles translation, speech recognition, speech synthesis, and public audio URL generation.
+- Vietnamese to Japanese translation, then D-ID speaks the translated text.
+- Japanese to Vietnamese translation, then Google TTS generates audio for D-ID playback.
 
 ## Features
 
-- Realtime speech-to-speech workflow.
-- Vietnamese and Japanese direction switching.
-- Google STT for audio transcription.
-- DeepL translation for VI and JA.
-- Google TTS for generated Vietnamese audio.
-- D-ID agent integration for avatar playback.
-- Public audio URL support via Cloudflare Tunnel or any HTTPS endpoint.
+- Switch between Vietnamese to Japanese and Japanese to Vietnamese modes.
+- Record from the browser microphone or upload MP3/WAV audio.
+- Transcribe speech with Google Speech-to-Text.
+- Translate VI and JA content with DeepL.
+- Generate Vietnamese speech with Google Text-to-Speech.
+- Drive an interactive D-ID Agent through the browser SDK.
+- Serve generated audio through a public HTTPS base URL for D-ID.
+- Run locally with separate frontend/backend processes or Docker Compose.
+
+## Project Structure
+
+```text
+backend/    Express API for translation, STT, TTS, env loading, and audio files
+frontend/   React + Vite client for the realtime voice agent UI
+docs/       Project notes, deployment guide, and README assets
+```
+
+The repository keeps frontend and backend separate because the browser UI, D-ID SDK, Google services, and public audio hosting each have different runtime needs.
 
 ## Requirements
 
-- Node.js 20 or newer.
-- npm.
-- A Google Cloud service account JSON key with Speech-to-Text and Text-to-Speech access.
-- A DeepL API key.
-- A D-ID agent ID and client key.
-- Optional: `cloudflared` for exposing the local backend to D-ID.
+- Node.js 20+
+- npm
+- Google Cloud service account JSON with Speech-to-Text and Text-to-Speech access
+- DeepL API key
+- D-ID agent ID and client key
+- Optional: `cloudflared` for exposing local generated audio to D-ID
 
 ## Configuration
 
-Copy [`.env.example`](.env.example) to [`.env`](.env) and fill in your own values.
+Copy the example environment file and fill in your own values:
 
-Important notes:
+```bash
+cp .env.example .env
+```
+
+PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Important runtime notes:
 
 - `GOOGLE_APPLICATION_CREDENTIALS=./google-credentials.json` is resolved from the folder where the backend process starts.
-- If you run `npm run dev` inside `backend/`, place the JSON file at `backend/google-credentials.json`.
-- `PUBLIC_BASE_URL` must be a public HTTPS URL when you use the Japanese to Vietnamese flow, because D-ID needs to fetch the generated audio file from outside your machine.
-- The frontend does not need a separate `.env`; it falls back to the backend URL automatically.
+- If you run the backend from `backend/`, place the credentials file at `backend/google-credentials.json`.
+- `PUBLIC_BASE_URL` must be a public HTTPS URL for the Japanese to Vietnamese flow because D-ID needs to fetch generated audio from outside your machine.
+- The frontend does not need a separate `.env` for local development; it falls back to `http://127.0.0.1:8081`.
 
-### Main Environment Variables
+Main environment variables:
 
 | Variable | Purpose |
 | --- | --- |
 | `PORT` | Backend port, default `8081` |
-| `GOOGLE_APPLICATION_CREDENTIALS` | Path to the Google service account JSON |
-| `PUBLIC_BASE_URL` | Public HTTPS base URL for generated audio files |
+| `FRONTEND_ORIGIN` / `FRONTEND_ORIGINS` | Allowed browser origins for CORS |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Google service account JSON path |
+| `GOOGLE_STT_LANGUAGE_CODE` | Default Google STT language |
+| `GOOGLE_TTS_LANGUAGE_CODE` | Default Google TTS language |
+| `PUBLIC_BASE_URL` | Public HTTPS base URL for generated audio |
 | `DEEPL_AUTH_KEY` | DeepL authentication key |
-| `DEEPL_SOURCE_LANGUAGE` | Source language code used by DeepL |
-| `DEEPL_TARGET_LANGUAGE` | Target language code used by DeepL |
-| `D_ID_AGENT_ID` | D-ID agent ID |
+| `DEEPL_SOURCE_LANGUAGE` | Default DeepL source language |
+| `DEEPL_TARGET_LANGUAGE` | Default DeepL target language |
+| `D_ID_AGENT_ID` | D-ID Agent ID |
 | `D_ID_CLIENT_KEY` | D-ID client key |
 
-## Local Setup
+## Quick Start
 
-### 1. Install dependencies
+Install backend dependencies:
 
-```powershell
-Set-Location .\backend
-npm install
-
-Set-Location ..\frontend
+```bash
+cd backend
 npm install
 ```
 
-### 2. Start the backend
+Install frontend dependencies:
 
-```powershell
-Set-Location .\backend
+```bash
+cd frontend
+npm install
+```
+
+Start the backend:
+
+```bash
+cd backend
 npm run dev
 ```
 
-The backend will start on `http://127.0.0.1:8081` by default.
+The API starts at:
 
-### 3. Start the frontend
+```text
+http://127.0.0.1:8081
+```
 
-```powershell
-Set-Location .\frontend
+Start the frontend:
+
+```bash
+cd frontend
 npm run dev
 ```
 
-Open the app at `http://127.0.0.1:5174/ver2`.
+Open the app:
 
-## Cloudflare Tunnel for Public Audio
+```text
+http://127.0.0.1:5174/ver2
+```
 
-Use this when you want the Japanese to Vietnamese flow to work correctly with D-ID:
+## Public Audio For D-ID
 
-```powershell
+Use a tunnel when D-ID needs to fetch generated audio from your local backend:
+
+```bash
 cloudflared tunnel --url http://127.0.0.1:8081
 ```
 
-After the tunnel starts, copy the generated `https://...trycloudflare.com` URL into `PUBLIC_BASE_URL` in [`.env`](.env), then restart the backend.
+Copy the generated `https://...trycloudflare.com` URL into `PUBLIC_BASE_URL`, then restart the backend.
 
-Do not use `localhost` for `PUBLIC_BASE_URL`. D-ID needs a public HTTPS URL that it can fetch directly.
+Do not use `localhost` for `PUBLIC_BASE_URL`. D-ID must receive a public HTTPS URL that it can access directly.
 
 ## Docker Compose
 
-The repository includes a Docker Compose setup for local containerized runs.
+Before running Docker Compose:
 
-Before you start:
+- Create `.env` in the repository root.
+- Put the Google service account JSON at `backend/google-credentials.json`.
+- Set `PUBLIC_BASE_URL` to a public HTTPS URL if you use generated audio with D-ID.
 
-- Make sure [`.env`](.env) exists in the repository root.
-- Make sure [`backend/google-credentials.json`](backend/google-credentials.json) exists and points to a valid Google service account key.
-- If you use the Japanese to Vietnamese flow, `PUBLIC_BASE_URL` must point to a public HTTPS URL, such as a Cloudflare Tunnel URL.
+Start the stack:
 
-```powershell
+```bash
 docker compose up -d --build
 ```
 
-What this starts:
+This starts:
 
-- Backend container mapped to host `8443`.
-- Frontend container mapped to host `80`.
+- Backend on host port `8443`
+- Frontend on host port `80`
 
 Useful checks:
 
-```powershell
+```bash
 docker compose ps
 curl http://127.0.0.1:8443/api/health
 curl http://127.0.0.1/api/health
 ```
 
-Open the app at:
+Open the Docker app:
 
-- `http://localhost/ver2`
-
-Useful commands:
-
-```powershell
-docker compose logs -f backend
-docker compose logs -f frontend
-docker compose down
+```text
+http://localhost/ver2
 ```
 
-Important Docker notes:
+If you use Cloudflare Tunnel with Docker, point it to the published backend port:
 
-- Docker Compose injects `env_file` values when the container is created.
-- The backend still needs the Google credentials JSON mounted into the container at `/app/google-credentials.json`.
-- The frontend container also needs `VITE_API_BASE_URL=http://127.0.0.1:8443` so the browser calls the backend on the published Docker port instead of falling back to `127.0.0.1:8081`.
-- If you click Run on an image directly in Docker Desktop, `env_file` is not applied automatically. In that case you must add the environment variables, the frontend API URL, and the credentials mount by hand.
-
-If you use Cloudflare Tunnel with Docker, point it to the published backend port on the host:
-
-```powershell
+```bash
 cloudflared tunnel --url http://127.0.0.1:8443
 ```
 
-If you use Docker locally, keep the Google credentials outside the image and mount them at runtime, or use Application Default Credentials on the host or VM.
+## API
 
-## API Endpoints
-
-- `GET /api/health` - health summary and missing config hints.
-- `GET /api/embed-config` - returns the D-ID agent config used by the frontend.
+- `GET /api/health` - Health summary and missing config hints.
+- `GET /api/embed-config` - D-ID Agent config for the frontend.
 - `POST /api/realtime/translate` - DeepL translation.
-- `POST /api/realtime/transcribe` - audio upload to Google STT.
-- `POST /api/realtime/synthesize` - text to Google TTS audio URL.
+- `POST /api/realtime/transcribe` - Audio upload and Google STT transcription.
+- `POST /api/realtime/synthesize` - Google TTS audio generation and public audio URL.
 
-## Project Structure
+## Development Commands
 
-- `backend/` - Express API, translation, STT, TTS, and file handling.
-- `frontend/` - React + Vite client UI.
-- `docs/` - deployment and project notes.
+Backend:
+
+```bash
+npm run dev      # Start Express in watch mode
+npm run start    # Start Express normally
+npm test         # Placeholder test script
+```
+
+Frontend:
+
+```bash
+npm run dev      # Start Vite
+npm run build    # Build production assets
+npm run lint     # Run ESLint
+npm run preview  # Preview production build
+```
 
 ## Troubleshooting
 
-- If D-ID returns a validation error for `audio_url`, check that `PUBLIC_BASE_URL` is a reachable HTTPS URL and not `localhost`.
-- If Google STT or TTS fails, verify the service account JSON path and make sure the corresponding Google Cloud APIs are enabled.
-- If the frontend cannot reach the backend, confirm the backend is running on `127.0.0.1:8081` and that CORS is allowed by the current `.env` settings.
+- If D-ID rejects `audio_url`, confirm `PUBLIC_BASE_URL` is public HTTPS and not `localhost`.
+- If Google STT or TTS fails, check the service account path and make sure both Google Cloud APIs are enabled.
+- If the frontend cannot reach the backend, confirm the API is running on `127.0.0.1:8081` and CORS allows the current origin.
+- If Docker Desktop is used to run an image directly, remember that `env_file` and volume mounts from Compose are not applied automatically.
 
-## Notes
+## Status
 
-- Do not commit `.env` files, credential JSON files, or generated uploads.
-- The recommended local flow is `backend/` for the API and `frontend/` for the UI, with `cloudflared` only when public audio access is required.
+Voice Agent Vn-Jp is a realtime demo app. The main path is already wired through React, Express, DeepL, Google STT/TTS, and D-ID; the next useful improvements are stronger automated tests, production-friendly frontend serving, and tighter CI/CD for deployment.
